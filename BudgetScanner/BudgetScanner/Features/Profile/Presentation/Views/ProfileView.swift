@@ -11,6 +11,7 @@ import SwiftUI
 struct ProfileView: View {
     @State private var viewModel = ProfileViewModel()
     @Environment(ThemeManager.self) private var themeManager
+    @Environment(AuthViewModel.self) private var authViewModel
 
     var body: some View {
         NavigationStack {
@@ -37,7 +38,6 @@ struct ProfileView: View {
     @ViewBuilder
     private func profileContent(_ profile: ProfileEntity) -> some View {
         List {
-            // Avatar header
             Section {
                 HStack(spacing: 16) {
                     ZStack {
@@ -61,7 +61,6 @@ struct ProfileView: View {
                 .padding(.vertical, 8)
             }
 
-            // Ajustes
             Section(String(localized: "settings")) {
                 Button {
                     viewModel.showEditProfile = true
@@ -122,10 +121,7 @@ struct ProfileView: View {
 
             Section {
                 Button(role: .destructive) {
-                    Task {
-                        let repo = AuthRepository()
-                        try? await repo.logout()
-                    }
+                    Task { await authViewModel.signOut() }
                 } label: {
                     Label(String(localized: "sign_out"), systemImage: "rectangle.portrait.and.arrow.right")
                 }

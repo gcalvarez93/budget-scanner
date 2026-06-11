@@ -15,9 +15,10 @@ struct ContentView: View {
         Group {
             if viewModel.isLoading {
                 ProgressView()
-                    .tint(.emerald)
+                    .tint(Color.emerald)
             } else if viewModel.isAuthenticated {
                 MainTabView()
+                    .environment(viewModel)
             } else {
                 LoginView()
                     .environment(viewModel)
