@@ -23,6 +23,11 @@
 			path = BudgetScanner;
 			sourceTree = "<group>";
 		};
+		B6B094902FDAE60600A797B3 /* ScreenShots */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = ScreenShots;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -43,6 +48,7 @@
 		B6B093502FDA1DE500A797B3 = {
 			isa = PBXGroup;
 			children = (
+				B6B094902FDAE60600A797B3 /* ScreenShots */,
 				B6B0935B2FDA1DE500A797B3 /* BudgetScanner */,
 				B6B0935A2FDA1DE500A797B3 /* Products */,
 			);
@@ -73,6 +79,7 @@
 			);
 			fileSystemSynchronizedGroups = (
 				B6B0935B2FDA1DE500A797B3 /* BudgetScanner */,
+				B6B094902FDAE60600A797B3 /* ScreenShots */,
 			);
 			name = BudgetScanner;
 			packageProductDependencies = (
