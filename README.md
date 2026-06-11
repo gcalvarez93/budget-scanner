@@ -7,14 +7,14 @@ A budget and expense tracking app built as part of the [CastroDev](https://castr
 ## 📱 Screenshots
 
 <p align="center">
-  <img src="screenshots/login_light.png" width="23%" />
-  <img src="screenshots/boards_light.png" width="23%" />
-  <img src="screenshots/transactions_light.png" width="23%" />
-  <img src="screenshots/profile_dark.png" width="23%" />
+  <img src="BudgetScanner/ScreenShots/login_light.png" width="23%" />
+  <img src="BudgetScanner/ScreenShots/boards_light.png" width="23%" />
+  <img src="BudgetScanner/ScreenShots/transactions_light.png" width="23%" />
+  <img src="ScreenShots/profile_dark.png" width="23%" />
 </p>
 <p align="center">
-  <img src="screenshots/boards_dark.png" width="23%" />
-  <img src="screenshots/analytics_dark.png" width="23%" />
+  <img src="BudgetScanner/ScreenShots/boards_dark.png" width="23%" />
+  <img src="BudgetScanner/ScreenShots/analytics_dark.png" width="23%" />
 </p>
 
 ---
