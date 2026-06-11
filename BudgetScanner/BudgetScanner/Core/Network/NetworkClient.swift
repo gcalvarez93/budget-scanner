@@ -19,11 +19,14 @@ final class NetworkClient: NetworkClientProtocol {
     static let shared = NetworkClient()
     private let tokenProvider: TokenProviderProtocol
     private let decoder: JSONDecoder
+    private let encoder: JSONEncoder
 
     init(tokenProvider: TokenProviderProtocol = FirebaseTokenProvider()) {
         self.tokenProvider = tokenProvider
         self.decoder = JSONDecoder()
         self.decoder.dateDecodingStrategy = .iso8601
+        self.encoder = JSONEncoder()
+        self.encoder.dateEncodingStrategy = .iso8601
     }
 
     func get<T: Decodable>(_ url: String) async throws -> T {
@@ -33,13 +36,13 @@ final class NetworkClient: NetworkClientProtocol {
 
     func post<T: Decodable, B: Encodable>(_ url: String, body: B) async throws -> T {
         var request = try await buildRequest(url: url, method: "POST")
-        request.httpBody = try JSONEncoder().encode(body)
+        request.httpBody = try encoder.encode(body)
         return try await perform(request)
     }
 
     func put<T: Decodable, B: Encodable>(_ url: String, body: B) async throws -> T {
         var request = try await buildRequest(url: url, method: "PUT")
-        request.httpBody = try JSONEncoder().encode(body)
+        request.httpBody = try encoder.encode(body)
         return try await perform(request)
     }
 

@@ -10,6 +10,7 @@ import Foundation
 
 enum APIConfig {
     static let baseURL = "https://api.castrodev.com/api/budgetscanner"
+    static let userMe = "https://api.castrodev.com/api/common/users/me"
 
     enum Budgets {
         static let base           = "\(baseURL)/budgets"

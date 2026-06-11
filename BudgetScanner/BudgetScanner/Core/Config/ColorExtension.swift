@@ -9,14 +9,14 @@
 import SwiftUI
 
 extension Color {
-    static let bgPrimary      = Color("BgPrimary")
-    static let bgSecondary    = Color("BgSecondary")
-    static let bgCard         = Color("BgCard")
-    static let textPrimary    = Color("TextPrimary")
-    static let textSecondary  = Color("TextSecondary")
-    static let emerald        = Color(hex: "#10B981")
-    static let warningColor   = Color(hex: "#F59E0B")
-    static let errorColor     = Color(hex: "#EF4444")
+    static let bgPrimary     = Color(.systemBackground)
+    static let bgSecondary   = Color(.secondarySystemBackground)
+    static let bgCard        = Color(.systemBackground)
+    static let textPrimary   = Color(.label)
+    static let textSecondary = Color(.secondaryLabel)
+    static let emerald       = Color(hex: "#10B981")
+    static let warningColor  = Color(hex: "#F59E0B")
+    static let errorColor    = Color(hex: "#EF4444")
 
     init(hex: String) {
         let hex = hex.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)

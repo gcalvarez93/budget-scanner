@@ -16,13 +16,6 @@ struct MainTabView: View {
                     Label(String(localized: "tab_budgets"), systemImage: "chart.pie.fill")
                 }
 
-            TransactionsView(budget: .init(
-                id: "", name: "", category: "", limit: 0,
-                spent: 0, remainingAmount: 0, spentPercentage: 0,
-                color: "#10B981", currency: "EUR",
-                isRecurring: false, alertThreshold: 80,
-                isAlertTriggered: false, createdAt: .now
-            ))
 
             AnalyticsView()
                 .tabItem {
