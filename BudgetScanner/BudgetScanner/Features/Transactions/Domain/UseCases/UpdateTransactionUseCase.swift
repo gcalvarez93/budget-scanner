@@ -16,7 +16,7 @@ final class UpdateTransactionUseCase {
     }
 
     func execute(id: String, budgetId: String, category: String, amount: Double, currency: String, description: String, notes: String, tags: [String], receiptImageUrl: String?, merchant: String?, date: Date) async throws {
-        guard amount > 0 else { throw Failure.network("Amount must be greater than zero") }
+        guard amount > 0 else { throw Failure.validation("Amount must be greater than zero") }
         try await repository.updateTransaction(
             id: id, budgetId: budgetId, category: category,
             amount: amount, currency: currency, description: description,

@@ -49,6 +49,7 @@ final class TransactionsViewModel {
             let transactions = try await getTransactions.execute(budgetId: budget.id)
             state = .loaded(transactions)
         } catch {
+            AppLogger.error("TransactionsViewModel.loadTransactions", error)
             state = .error(error.localizedDescription)
         }
     }
@@ -63,6 +64,7 @@ final class TransactionsViewModel {
             )
             await loadTransactions()
         } catch {
+            AppLogger.error("TransactionsViewModel.addTransaction", error)
             state = .error(error.localizedDescription)
         }
     }
@@ -77,6 +79,7 @@ final class TransactionsViewModel {
             )
             await loadTransactions()
         } catch {
+            AppLogger.error("TransactionsViewModel.editTransaction", error)
             state = .error(error.localizedDescription)
         }
     }
@@ -86,6 +89,7 @@ final class TransactionsViewModel {
             try await deleteTransaction.execute(id: id)
             await loadTransactions()
         } catch {
+            AppLogger.error("TransactionsViewModel.removeTransaction", error)
             state = .error(error.localizedDescription)
         }
     }

@@ -48,6 +48,7 @@ final class BudgetsViewModel {
             let budgets = try await getBudgets.execute()
             state = .loaded(budgets)
         } catch {
+            AppLogger.error("BudgetsViewModel.loadBudgets", error)
             state = .error(error.localizedDescription)
         }
     }
@@ -61,6 +62,7 @@ final class BudgetsViewModel {
             )
             await loadBudgets()
         } catch {
+            AppLogger.error("BudgetsViewModel.addBudget", error)
             state = .error(error.localizedDescription)
         }
     }
@@ -74,6 +76,7 @@ final class BudgetsViewModel {
             )
             await loadBudgets()
         } catch {
+            AppLogger.error("BudgetsViewModel.editBudget", error)
             state = .error(error.localizedDescription)
         }
     }
@@ -83,6 +86,7 @@ final class BudgetsViewModel {
             try await deleteBudget.execute(id: id)
             await loadBudgets()
         } catch {
+            AppLogger.error("BudgetsViewModel.removeBudget", error)
             state = .error(error.localizedDescription)
         }
     }
@@ -92,6 +96,7 @@ final class BudgetsViewModel {
             try await resetRecurring.execute()
             await loadBudgets()
         } catch {
+            AppLogger.error("BudgetsViewModel.resetRecurringBudgets", error)
             state = .error(error.localizedDescription)
         }
     }

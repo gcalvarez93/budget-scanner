@@ -70,6 +70,7 @@ final class AuthViewModel {
             let user = try await loginWithEmail.execute(email: email, password: password)
             state = .authenticated(user)
         } catch {
+            AppLogger.error("AuthViewModel.signInWithEmail", error)
             state = .error(error.localizedDescription)
         }
     }
@@ -80,6 +81,7 @@ final class AuthViewModel {
             let user = try await registerWithEmail.execute(email: email, password: password, name: name)
             state = .authenticated(user)
         } catch {
+            AppLogger.error("AuthViewModel.signUpWithEmail", error)
             state = .error(error.localizedDescription)
         }
     }
@@ -90,6 +92,7 @@ final class AuthViewModel {
             let user = try await loginWithGoogle.execute()
             state = .authenticated(user)
         } catch {
+            AppLogger.error("AuthViewModel.signInWithGoogle", error)
             state = .error(error.localizedDescription)
         }
     }
@@ -100,6 +103,7 @@ final class AuthViewModel {
             try await logout.execute()
             state = .unauthenticated
         } catch {
+            AppLogger.error("AuthViewModel.signOut", error)
             state = .error(error.localizedDescription)
         }
     }

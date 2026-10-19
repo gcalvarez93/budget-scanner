@@ -7,17 +7,35 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		B6A0912B30869E180011A174 /* InMemoryLogging in Frameworks */ = {isa = PBXBuildFile; productRef = B6A0912A30869E180011A174 /* InMemoryLogging */; };
+		B6A0912D30869E180011A174 /* Logging in Frameworks */ = {isa = PBXBuildFile; productRef = B6A0912C30869E180011A174 /* Logging */; };
 		B6B093692FDA1E1000A797B3 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = B6B093682FDA1E1000A797B3 /* FirebaseAuth */; };
 		B6B0936B2FDA1E1000A797B3 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = B6B0936A2FDA1E1000A797B3 /* FirebaseFirestore */; };
 		B6B0936E2FDA1E2400A797B3 /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = B6B0936D2FDA1E2400A797B3 /* GoogleSignIn */; };
 		B6B093702FDA1E2400A797B3 /* GoogleSignInSwift in Frameworks */ = {isa = PBXBuildFile; productRef = B6B0936F2FDA1E2400A797B3 /* GoogleSignInSwift */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		B6A0913630869E590011A174 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = B6B093512FDA1DE500A797B3 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = B6B093582FDA1DE500A797B3;
+			remoteInfo = BudgetScanner;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
+		B6A0913230869E590011A174 /* BudgetScannerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BudgetScannerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		B6B093592FDA1DE500A797B3 /* BudgetScanner.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BudgetScanner.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		B6A0913330869E590011A174 /* BudgetScannerTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = BudgetScannerTests;
+			sourceTree = "<group>";
+		};
 		B6B0935B2FDA1DE500A797B3 /* BudgetScanner */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = BudgetScanner;
@@ -31,11 +49,20 @@
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		B6A0912F30869E590011A174 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		B6B093562FDA1DE500A797B3 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B6A0912D30869E180011A174 /* Logging in Frameworks */,
 				B6B093692FDA1E1000A797B3 /* FirebaseAuth in Frameworks */,
+				B6A0912B30869E180011A174 /* InMemoryLogging in Frameworks */,
 				B6B0936B2FDA1E1000A797B3 /* FirebaseFirestore in Frameworks */,
 				B6B0936E2FDA1E2400A797B3 /* GoogleSignIn in Frameworks */,
 				B6B093702FDA1E2400A797B3 /* GoogleSignInSwift in Frameworks */,
@@ -50,6 +77,7 @@
 			children = (
 				B6B094902FDAE60600A797B3 /* ScreenShots */,
 				B6B0935B2FDA1DE500A797B3 /* BudgetScanner */,
+				B6A0913330869E590011A174 /* BudgetScannerTests */,
 				B6B0935A2FDA1DE500A797B3 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -58,6 +86,7 @@
 			isa = PBXGroup;
 			children = (
 				B6B093592FDA1DE500A797B3 /* BudgetScanner.app */,
+				B6A0913230869E590011A174 /* BudgetScannerTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -65,6 +94,29 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		B6A0913130869E590011A174 /* BudgetScannerTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B6A0913830869E590011A174 /* Build configuration list for PBXNativeTarget "BudgetScannerTests" */;
+			buildPhases = (
+				B6A0912E30869E590011A174 /* Sources */,
+				B6A0912F30869E590011A174 /* Frameworks */,
+				B6A0913030869E590011A174 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				B6A0913730869E590011A174 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				B6A0913330869E590011A174 /* BudgetScannerTests */,
+			);
+			name = BudgetScannerTests;
+			packageProductDependencies = (
+			);
+			productName = BudgetScannerTests;
+			productReference = B6A0913230869E590011A174 /* BudgetScannerTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		B6B093582FDA1DE500A797B3 /* BudgetScanner */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = B6B093642FDA1DE500A797B3 /* Build configuration list for PBXNativeTarget "BudgetScanner" */;
@@ -87,6 +139,8 @@
 				B6B0936A2FDA1E1000A797B3 /* FirebaseFirestore */,
 				B6B0936D2FDA1E2400A797B3 /* GoogleSignIn */,
 				B6B0936F2FDA1E2400A797B3 /* GoogleSignInSwift */,
+				B6A0912A30869E180011A174 /* InMemoryLogging */,
+				B6A0912C30869E180011A174 /* Logging */,
 			);
 			productName = BudgetScanner;
 			productReference = B6B093592FDA1DE500A797B3 /* BudgetScanner.app */;
@@ -99,9 +153,14 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 2650;
+				LastSwiftUpdateCheck = 2710;
 				LastUpgradeCheck = 2650;
 				TargetAttributes = {
+					B6A0913130869E590011A174 = {
+						CreatedOnToolsVersion = 27.1;
+						LastSwiftMigration = 2710;
+						TestTargetID = B6B093582FDA1DE500A797B3;
+					};
 					B6B093582FDA1DE500A797B3 = {
 						CreatedOnToolsVersion = 26.5;
 					};
@@ -120,6 +179,7 @@
 			packageReferences = (
 				B6B093672FDA1E1000A797B3 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 				B6B0936C2FDA1E2400A797B3 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */,
+				B6A0912930869E180011A174 /* XCRemoteSwiftPackageReference "swift-log" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = B6B0935A2FDA1DE500A797B3 /* Products */;
@@ -127,11 +187,19 @@
 			projectRoot = "";
 			targets = (
 				B6B093582FDA1DE500A797B3 /* BudgetScanner */,
+				B6A0913130869E590011A174 /* BudgetScannerTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		B6A0913030869E590011A174 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		B6B093572FDA1DE500A797B3 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -142,6 +210,13 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		B6A0912E30869E590011A174 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		B6B093552FDA1DE500A797B3 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -151,7 +226,62 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		B6A0913730869E590011A174 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = B6B093582FDA1DE500A797B3 /* BudgetScanner */;
+			targetProxy = B6A0913630869E590011A174 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin XCBuildConfiguration section */
+		B6A0913930869E590011A174 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = BWT3NJX9MX;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.5;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.castrodev.BudgetScannerTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/BudgetScanner.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/BudgetScanner";
+			};
+			name = Debug;
+		};
+		B6A0913A30869E590011A174 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = BWT3NJX9MX;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.5;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.castrodev.BudgetScannerTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/BudgetScanner.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/BudgetScanner";
+			};
+			name = Release;
+		};
 		B6B093622FDA1DE500A797B3 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -342,6 +472,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		B6A0913830869E590011A174 /* Build configuration list for PBXNativeTarget "BudgetScannerTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B6A0913930869E590011A174 /* Debug */,
+				B6A0913A30869E590011A174 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		B6B093542FDA1DE500A797B3 /* Build configuration list for PBXProject "BudgetScanner" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -363,6 +502,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		B6A0912930869E180011A174 /* XCRemoteSwiftPackageReference "swift-log" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/apple/swift-log";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.16.1;
+			};
+		};
 		B6B093672FDA1E1000A797B3 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
@@ -382,6 +529,16 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		B6A0912A30869E180011A174 /* InMemoryLogging */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B6A0912930869E180011A174 /* XCRemoteSwiftPackageReference "swift-log" */;
+			productName = InMemoryLogging;
+		};
+		B6A0912C30869E180011A174 /* Logging */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B6A0912930869E180011A174 /* XCRemoteSwiftPackageReference "swift-log" */;
+			productName = Logging;
+		};
 		B6B093682FDA1E1000A797B3 /* FirebaseAuth */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = B6B093672FDA1E1000A797B3 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;

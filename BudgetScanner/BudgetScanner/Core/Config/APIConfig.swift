@@ -36,7 +36,4 @@ enum APIConfig {
         }
     }
 
-    enum Receipts {
-        static let scan = "\(baseURL)/receipts/scan"
-    }
 }

@@ -24,9 +24,12 @@ final class TransactionRemoteDataSource: TransactionRemoteDataSourceProtocol {
     }
 
     func getTransactions(budgetId: String?) async throws -> [TransactionModel] {
-        let url = budgetId != nil
-            ? APIConfig.Transactions.byBudget(budgetId!)
-            : APIConfig.Transactions.base
+        let url: String
+        if let budgetId {
+            url = APIConfig.Transactions.byBudget(budgetId)
+        } else {
+            url = APIConfig.Transactions.base
+        }
         return try await client.get(url)
     }
 
@@ -35,9 +38,6 @@ final class TransactionRemoteDataSource: TransactionRemoteDataSourceProtocol {
     }
 
     func createTransaction(_ request: CreateTransactionRequest) async throws -> String {
-        let encoded = try JSONEncoder().encode(request)
-        let json = String(data: encoded, encoding: .utf8) ?? "nil"
-        print("CreateTransaction body: \(json)")
         return try await client.post(APIConfig.Transactions.base, body: request)
     }
 

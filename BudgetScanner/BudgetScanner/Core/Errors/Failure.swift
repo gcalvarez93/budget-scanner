@@ -8,11 +8,12 @@
 // Path: BudgetScanner/Core/Errors/Failure.swift
 import Foundation
 
-enum Failure: LocalizedError {
+enum Failure: LocalizedError, Equatable {
     case network(String)
     case server(String)
     case auth(String)
     case decoding(String)
+    case validation(String)
     case unknown
 
     var errorDescription: String? {
@@ -21,6 +22,7 @@ enum Failure: LocalizedError {
         case .server(let msg):   return "Server error: \(msg)"
         case .auth(let msg):     return "Auth error: \(msg)"
         case .decoding(let msg): return "Decoding error: \(msg)"
+        case .validation(let msg): return msg
         case .unknown:           return "An unknown error occurred"
         }
     }

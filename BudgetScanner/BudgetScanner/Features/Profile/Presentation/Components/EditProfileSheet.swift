@@ -15,6 +15,12 @@ struct EditProfileSheet: View {
     let profile: ProfileEntity
 
     @State private var name = ""
+    @State private var isSaving = false
+    @State private var showError = false
+
+    private var trimmedName: String {
+        name.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
 
     var body: some View {
         NavigationStack {
@@ -31,19 +37,33 @@ struct EditProfileSheet: View {
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     Button(String(localized: "save")) {
-                        Task {
-                            await viewModel.update(
-                                name: name,
-                                language: profile.language,
-                                notifications: profile.notifications
-                            )
-                            dismiss()
-                        }
+                        Task { await save() }
                     }
-                    .disabled(name.isEmpty)
+                    .disabled(trimmedName.isEmpty || isSaving)
                 }
             }
+            .alert(String(localized: "error"), isPresented: $showError) {
+                Button(String(localized: "OK"), role: .cancel) {}
+            } message: {
+                Text(String(localized: "profile_update_error"))
+            }
             .onAppear { name = profile.name }
+        }
+    }
+
+    private func save() async {
+        isSaving = true
+        defer { isSaving = false }
+
+        let saved = await viewModel.update(
+            name: trimmedName,
+            language: profile.language,
+            notifications: profile.notifications
+        )
+        if saved {
+            dismiss()
+        } else {
+            showError = true
         }
     }
 }

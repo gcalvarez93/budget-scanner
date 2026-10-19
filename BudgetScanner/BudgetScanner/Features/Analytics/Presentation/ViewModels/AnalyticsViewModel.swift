@@ -52,6 +52,7 @@ final class AnalyticsViewModel {
             comparison = try await comparisonResult
             state = .loaded
         } catch {
+            AppLogger.error("AnalyticsViewModel.loadAnalytics", error)
             state = .error(error.localizedDescription)
         }
     }
