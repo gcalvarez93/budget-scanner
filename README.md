@@ -1,6 +1,6 @@
 # Budget Scanner
 
-A budget and expense tracking app built as part of the [CastroDev](https://castrodev.com) portfolio. Create custom budgets, track your spending and get monthly analytics, with full dark mode support.
+A budget and expense tracking app built as part of the CastroDev portfolio. Create custom budgets, track your spending and get monthly analytics, with full dark mode support.
 
 ---
 
@@ -157,13 +157,12 @@ xcodebuild test \
 - [Finance Tracker](https://github.com/gcalvarez93/finance-tracker) — Personal finance app (Flutter)
 - [Habit Tracker](https://github.com/gcalvarez93/habit-tracker) — Daily habit tracking app (Flutter)
 - [Task Manager](https://github.com/gcalvarez93/task-manager) — Board-based task management (iOS)
-- [castrodev.com](https://castrodev.com) — Portfolio
 
 ---
 
 ## 📄 License
 
-MIT © [Gabriel Castro](https://castrodev.com)
+MIT © Gabriel Castro
 
 ---
 
@@ -171,7 +170,7 @@ MIT © [Gabriel Castro](https://castrodev.com)
 
 # Budget Scanner
 
-App de seguimiento de presupuestos y gastos desarrollada como parte del portfolio de [CastroDev](https://castrodev.com). Crea presupuestos personalizados, registra tus gastos y obtén análisis mensuales, con soporte completo de modo oscuro.
+App de seguimiento de presupuestos y gastos desarrollada como parte del portfolio de CastroDev. Crea presupuestos personalizados, registra tus gastos y obtén análisis mensuales, con soporte completo de modo oscuro.
 
 ---
 
@@ -274,4 +273,9 @@ xcodebuild test \
 - [Finance Tracker](https://github.com/gcalvarez93/finance-tracker) — App de finanzas personales (Flutter)
 - [Habit Tracker](https://github.com/gcalvarez93/habit-tracker) — App de seguimiento de hábitos (Flutter)
 - [Task Manager](https://github.com/gcalvarez93/task-manager) — Gestión de tareas por tableros (iOS)
-- [castrodev.com](https://castrodev.com) — Portfolio
+
+---
+
+## 📄 Licencia
+
+MIT © Gabriel Castro
