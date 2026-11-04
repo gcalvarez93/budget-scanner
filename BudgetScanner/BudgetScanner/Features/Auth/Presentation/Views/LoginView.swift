@@ -16,6 +16,11 @@ struct LoginView: View {
     @State private var showError = false
     @State private var errorMessage = ""
 
+    private var isBusy: Bool {
+        if case .loading = viewModel.state { return true }
+        return false
+    }
+
     var body: some View {
         NavigationStack {
             ScrollView {
@@ -54,7 +59,7 @@ struct LoginView: View {
                         Task { await viewModel.signInWithEmail(email: email, password: password) }
                     } label: {
                         Group {
-                            if case .loading = viewModel.state {
+                            if isBusy {
                                 ProgressView().tint(.white)
                             } else {
                                 Text(String(localized: "sign_in"))
@@ -67,7 +72,7 @@ struct LoginView: View {
                         .background(Color.emerald)
                         .cornerRadius(12)
                     }
-                    .disabled(email.isEmpty || password.isEmpty)
+                    .disabled(email.isEmpty || password.isEmpty || isBusy)
 
                     HStack {
                         Rectangle().frame(height: 1).foregroundStyle(Color(.systemGray4))
@@ -78,6 +83,7 @@ struct LoginView: View {
                     GoogleSignInButton {
                         Task { await viewModel.signInWithGoogle() }
                     }
+                    .disabled(isBusy)
 
                     HStack {
                         Text(String(localized: "no_account"))
@@ -96,7 +102,8 @@ struct LoginView: View {
                     .environment(viewModel)
             }
             .onChange(of: viewModel.state) { _, newState in
-                if case .error(let message) = newState {
+                // Con el registro abierto, es esa pantalla la que avisa; si no, saldrían dos alertas.
+                if case .error(let message) = newState, !showRegister {
                     errorMessage = message
                     showError = true
                 }
