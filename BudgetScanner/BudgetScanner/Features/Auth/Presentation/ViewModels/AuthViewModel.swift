@@ -26,8 +26,11 @@ final class AuthViewModel {
         return false
     }
 
+    /// Solo es `true` mientras se comprueba la sesión al arrancar. Durante un inicio de sesión
+    /// (`.loading`) la pantalla de login sigue visible y muestra su propio indicador; si se
+    /// ocultara, se perdería lo escrito y el aviso de error no llegaría a verse.
     var isLoading: Bool {
-        state == .loading || state == .initial
+        state == .initial
     }
 
     var errorMessage: String? {
@@ -70,8 +73,7 @@ final class AuthViewModel {
             let user = try await loginWithEmail.execute(email: email, password: password)
             state = .authenticated(user)
         } catch {
-            AppLogger.error("AuthViewModel.signInWithEmail", error)
-            state = .error(error.localizedDescription)
+            handleSignInFailure(error, context: "AuthViewModel.signInWithEmail")
         }
     }
 
@@ -81,8 +83,7 @@ final class AuthViewModel {
             let user = try await registerWithEmail.execute(email: email, password: password, name: name)
             state = .authenticated(user)
         } catch {
-            AppLogger.error("AuthViewModel.signUpWithEmail", error)
-            state = .error(error.localizedDescription)
+            handleSignInFailure(error, context: "AuthViewModel.signUpWithEmail")
         }
     }
 
@@ -92,19 +93,34 @@ final class AuthViewModel {
             let user = try await loginWithGoogle.execute()
             state = .authenticated(user)
         } catch {
-            AppLogger.error("AuthViewModel.signInWithGoogle", error)
-            state = .error(error.localizedDescription)
+            handleSignInFailure(error, context: "AuthViewModel.signInWithGoogle")
         }
     }
 
-    func signOut() async {
-        state = .loading
+    /// Cierra la sesión. Devuelve `nil` si salió bien o el mensaje para el usuario si falló.
+    /// Si falla, la sesión sigue abierta: el estado no cambia y la pantalla actual se mantiene
+    /// para poder avisar, en lugar de sacar al usuario de su cuenta.
+    @discardableResult
+    func signOut() async -> String? {
         do {
             try await logout.execute()
             state = .unauthenticated
+            return nil
         } catch {
+            if error.isCancellation { return nil }
             AppLogger.error("AuthViewModel.signOut", error)
-            state = .error(error.localizedDescription)
+            return error.userFacingMessage
         }
+    }
+
+    /// Un fallo de inicio de sesión o registro deja al usuario sin sesión y con un mensaje.
+    /// Una cancelación (por ejemplo, cerrar la ventana de Google) no es un fallo.
+    private func handleSignInFailure(_ error: Error, context: String) {
+        if error.isCancellation {
+            state = .unauthenticated
+            return
+        }
+        AppLogger.error(context, error)
+        state = .error(error.userFacingMessage)
     }
 }

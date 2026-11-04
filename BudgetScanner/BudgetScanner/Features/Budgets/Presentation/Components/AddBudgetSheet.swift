@@ -21,6 +21,8 @@ struct AddBudgetSheet: View {
     @State private var currency = "EUR"
     @State private var isRecurring = false
     @State private var alertThreshold = 80
+    @State private var isSaving = false
+    @State private var errorMessage: String?
 
     private let currencies = ["EUR", "USD", "GBP"]
     private let colorOptions = ["#10B981", "#3B82F6", "#8B5CF6", "#F59E0B", "#EF4444", "#EC4899", "#14B8A6"]
@@ -81,27 +83,48 @@ struct AddBudgetSheet: View {
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     Button(String(localized: "save")) {
-                        Task {
-                            if isEditing, let budget = budgetToEdit {
-                                await viewModel.editBudget(
-                                    id: budget.id, name: name, category: category,
-                                    limit: limit, color: color, currency: currency,
-                                    isRecurring: isRecurring, alertThreshold: alertThreshold
-                                )
-                            } else {
-                                await viewModel.addBudget(
-                                    name: name, category: category, limit: limit,
-                                    color: color, currency: currency,
-                                    isRecurring: isRecurring, alertThreshold: alertThreshold
-                                )
-                            }
-                            dismiss()
-                        }
+                        Task { await save() }
                     }
-                    .disabled(name.isEmpty || category.isEmpty || limit <= 0)
+                    .disabled(name.isEmpty || category.isEmpty || limit <= 0 || isSaving)
                 }
             }
+            .alert(String(localized: "error"), isPresented: Binding(
+                get: { errorMessage != nil },
+                set: { if !$0 { errorMessage = nil } }
+            )) {
+                Button(String(localized: "OK"), role: .cancel) {}
+            } message: {
+                Text(errorMessage ?? "")
+            }
             .onAppear { populateIfEditing() }
+        }
+    }
+
+    /// Guarda y cierra la hoja solo si salió bien. Si falla, la hoja sigue abierta con lo escrito
+    /// y se avisa con una alerta.
+    private func save() async {
+        isSaving = true
+        defer { isSaving = false }
+
+        let message: String?
+        if isEditing, let budget = budgetToEdit {
+            message = await viewModel.editBudget(
+                id: budget.id, name: name, category: category,
+                limit: limit, color: color, currency: currency,
+                isRecurring: isRecurring, alertThreshold: alertThreshold
+            )
+        } else {
+            message = await viewModel.addBudget(
+                name: name, category: category, limit: limit,
+                color: color, currency: currency,
+                isRecurring: isRecurring, alertThreshold: alertThreshold
+            )
+        }
+
+        if let message {
+            errorMessage = message
+        } else {
+            dismiss()
         }
     }
 

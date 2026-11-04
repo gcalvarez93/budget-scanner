@@ -8,6 +8,8 @@ final class FakeAuthRepository: AuthRepositoryProtocol {
     var signedInUser: UserEntity?
     var loginResult: Result<UserEntity, Failure> = .success(TestData.user)
     var logoutResult: Result<Void, Failure> = .success(())
+    /// Si se define, el inicio de sesión con Google lanza este error (p. ej. una cancelación).
+    var googleError: Error?
 
     func loginWithEmail(email: String, password: String) async throws -> UserEntity {
         try loginResult.get()
@@ -18,7 +20,8 @@ final class FakeAuthRepository: AuthRepositoryProtocol {
     }
 
     func loginWithGoogle() async throws -> UserEntity {
-        try loginResult.get()
+        if let googleError { throw googleError }
+        return try loginResult.get()
     }
 
     func logout() async throws {
@@ -34,6 +37,8 @@ final class FakeAuthRepository: AuthRepositoryProtocol {
 @MainActor
 final class FakeBudgetRepository: BudgetRepositoryProtocol {
     var budgetsResult: Result<[BudgetEntity], Failure> = .success([])
+    /// Si se define, cargar los presupuestos lanza este error (p. ej. una cancelación).
+    var budgetsError: Error?
     var createResult: Result<String, Failure> = .success("b-new")
     var updateResult: Result<Void, Failure> = .success(())
     var deleteResult: Result<Void, Failure> = .success(())
@@ -47,6 +52,7 @@ final class FakeBudgetRepository: BudgetRepositoryProtocol {
 
     func getBudgets() async throws -> [BudgetEntity] {
         getBudgetsCalls += 1
+        if let budgetsError { throw budgetsError }
         return try budgetsResult.get()
     }
 

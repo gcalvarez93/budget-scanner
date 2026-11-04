@@ -16,8 +16,8 @@ final class CreateBudgetUseCase {
     }
 
     func execute(name: String, category: String, limit: Double, color: String, currency: String, isRecurring: Bool, alertThreshold: Int) async throws -> String {
-        guard !name.isEmpty else { throw Failure.validation("Name cannot be empty") }
-        guard limit > 0 else { throw Failure.validation("Limit must be greater than zero") }
+        guard !name.isEmpty else { throw Failure.validation(String(localized: "validation_name_empty")) }
+        guard limit > 0 else { throw Failure.validation(String(localized: "validation_limit_positive")) }
         return try await repository.createBudget(
             name: name, category: category, limit: limit,
             color: color, currency: currency,

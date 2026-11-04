@@ -34,13 +34,26 @@ struct AnalyticsViewModelTests {
         #expect(repository.requestedPeriods == ["2026-3"])
     }
 
-    @Test func loadAnalyticsFailureShowsTheMessage() async {
+    @Test func loadAnalyticsFailureShowsTheUserMessage() async {
         repository.summaryResult = .failure(.server("HTTP 500"))
         let viewModel = makeViewModel()
 
         await viewModel.loadAnalytics()
 
-        #expect(viewModel.state == .error("Server error: HTTP 500"))
+        #expect(viewModel.state == .error(Failure.server("HTTP 500").userMessage))
+    }
+
+    @Test func loadAnalyticsFailureDoesNotExposeTheTechnicalDetail() async {
+        repository.summaryResult = .failure(.server("HTTP 500"))
+        let viewModel = makeViewModel()
+
+        await viewModel.loadAnalytics()
+
+        guard case .error(let message) = viewModel.state else {
+            Issue.record("Expected an error state")
+            return
+        }
+        #expect(!message.contains("HTTP 500"))
     }
 
     @Test func previousMonthFromJanuaryGoesToDecemberOfThePreviousYear() {

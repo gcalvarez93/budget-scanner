@@ -11,6 +11,7 @@ import SwiftUI
 struct TransactionsView: View {
     let budget: BudgetEntity
     @State private var viewModel: TransactionsViewModel
+    @State private var actionError: String?
 
     init(budget: BudgetEntity) {
         self.budget = budget
@@ -68,6 +69,14 @@ struct TransactionsView: View {
         .refreshable {
             await viewModel.loadTransactions()
         }
+        .alert(String(localized: "error"), isPresented: Binding(
+            get: { actionError != nil },
+            set: { if !$0 { actionError = nil } }
+        )) {
+            Button(String(localized: "OK"), role: .cancel) {}
+        } message: {
+            Text(actionError ?? "")
+        }
         .environment(viewModel)
     }
 
@@ -103,7 +112,7 @@ struct TransactionsView: View {
                                     Label(String(localized: "edit"), systemImage: "pencil")
                                 }
                                 Button(role: .destructive) {
-                                    Task { await viewModel.removeTransaction(id: transaction.id) }
+                                    Task { actionError = await viewModel.removeTransaction(id: transaction.id) }
                                 } label: {
                                     Label(String(localized: "delete"), systemImage: "trash")
                                 }

@@ -44,6 +44,7 @@ final class AnalyticsViewModel {
     }
 
     func loadAnalytics() async {
+        let previous = state
         state = .loading
         do {
             async let summaryResult   = getMonthlySummary.execute(year: selectedYear, month: selectedMonth)
@@ -52,8 +53,16 @@ final class AnalyticsViewModel {
             comparison = try await comparisonResult
             state = .loaded
         } catch {
+            if error.isCancellation {
+                if case .loading = previous {
+                    state = .initial
+                } else {
+                    state = previous
+                }
+                return
+            }
             AppLogger.error("AnalyticsViewModel.loadAnalytics", error)
-            state = .error(error.localizedDescription)
+            state = .error(error.userFacingMessage)
         }
     }
 

@@ -44,17 +44,26 @@ final class TransactionsViewModel {
     }
 
     func loadTransactions() async {
+        let previous = state
         state = .loading
         do {
             let transactions = try await getTransactions.execute(budgetId: budget.id)
             state = .loaded(transactions)
         } catch {
+            if error.isCancellation {
+                restoreAfterCancellation(previous)
+                return
+            }
             AppLogger.error("TransactionsViewModel.loadTransactions", error)
-            state = .error(error.localizedDescription)
+            state = .error(error.userFacingMessage)
         }
     }
 
-    func addTransaction(category: String, amount: Double, currency: String, description: String, notes: String, tags: [String], receiptImageUrl: String?, merchant: String?, date: Date, isScanned: Bool) async {
+    // Las operaciones de escritura devuelven `nil` si salieron bien o el mensaje para el usuario
+    // si fallaron. Un fallo no sustituye la lista ya cargada: la pantalla decide cómo avisar.
+
+    @discardableResult
+    func addTransaction(category: String, amount: Double, currency: String, description: String, notes: String, tags: [String], receiptImageUrl: String?, merchant: String?, date: Date, isScanned: Bool) async -> String? {
         do {
             _ = try await createTransaction.execute(
                 budgetId: budget.id, category: category, amount: amount,
@@ -62,14 +71,15 @@ final class TransactionsViewModel {
                 tags: tags, receiptImageUrl: receiptImageUrl,
                 merchant: merchant, date: date, isScanned: isScanned
             )
-            await loadTransactions()
         } catch {
-            AppLogger.error("TransactionsViewModel.addTransaction", error)
-            state = .error(error.localizedDescription)
+            return failureMessage(for: error, context: "TransactionsViewModel.addTransaction")
         }
+        await loadTransactions()
+        return nil
     }
 
-    func editTransaction(id: String, category: String, amount: Double, currency: String, description: String, notes: String, tags: [String], receiptImageUrl: String?, merchant: String?, date: Date) async {
+    @discardableResult
+    func editTransaction(id: String, category: String, amount: Double, currency: String, description: String, notes: String, tags: [String], receiptImageUrl: String?, merchant: String?, date: Date) async -> String? {
         do {
             try await updateTransaction.execute(
                 id: id, budgetId: budget.id, category: category,
@@ -77,20 +87,36 @@ final class TransactionsViewModel {
                 notes: notes, tags: tags, receiptImageUrl: receiptImageUrl,
                 merchant: merchant, date: date
             )
-            await loadTransactions()
         } catch {
-            AppLogger.error("TransactionsViewModel.editTransaction", error)
-            state = .error(error.localizedDescription)
+            return failureMessage(for: error, context: "TransactionsViewModel.editTransaction")
         }
+        await loadTransactions()
+        return nil
     }
 
-    func removeTransaction(id: String) async {
+    @discardableResult
+    func removeTransaction(id: String) async -> String? {
         do {
             try await deleteTransaction.execute(id: id)
-            await loadTransactions()
         } catch {
-            AppLogger.error("TransactionsViewModel.removeTransaction", error)
-            state = .error(error.localizedDescription)
+            return failureMessage(for: error, context: "TransactionsViewModel.removeTransaction")
+        }
+        await loadTransactions()
+        return nil
+    }
+
+    /// Registra el fallo y devuelve el mensaje para el usuario. Una cancelación no es un fallo: `nil`.
+    private func failureMessage(for error: Error, context: String) -> String? {
+        if error.isCancellation { return nil }
+        AppLogger.error(context, error)
+        return error.userFacingMessage
+    }
+
+    private func restoreAfterCancellation(_ previous: TransactionsState) {
+        if case .loading = previous {
+            state = .initial
+        } else {
+            state = previous
         }
     }
 }

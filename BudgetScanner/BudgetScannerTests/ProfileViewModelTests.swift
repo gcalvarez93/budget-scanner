@@ -21,13 +21,26 @@ struct ProfileViewModelTests {
         #expect(viewModel.state == .loaded(TestData.profile))
     }
 
-    @Test func loadProfileFailureShowsTheMessage() async {
+    @Test func loadProfileFailureShowsTheUserMessage() async {
         repository.profileResult = .failure(.server("HTTP 500"))
         let viewModel = makeViewModel()
 
         await viewModel.loadProfile()
 
-        #expect(viewModel.state == .error("Server error: HTTP 500"))
+        #expect(viewModel.state == .error(Failure.server("HTTP 500").userMessage))
+    }
+
+    @Test func loadProfileFailureDoesNotExposeTheTechnicalDetail() async {
+        repository.profileResult = .failure(.server("HTTP 500"))
+        let viewModel = makeViewModel()
+
+        await viewModel.loadProfile()
+
+        guard case .error(let message) = viewModel.state else {
+            Issue.record("Expected an error state")
+            return
+        }
+        #expect(!message.contains("HTTP 500"))
     }
 
     @Test func updateReturnsTrueAndPublishesTheSavedProfile() async {

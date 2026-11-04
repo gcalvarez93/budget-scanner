@@ -1,4 +1,5 @@
 // Path: BudgetScanner/BudgetScannerTests/BudgetsViewModelTests.swift
+import Foundation
 import Testing
 @testable import BudgetScanner
 
@@ -16,6 +17,15 @@ struct BudgetsViewModelTests {
         )
     }
 
+    private func makeLoadedViewModel() async -> BudgetsViewModel {
+        repository.budgetsResult = .success([TestData.budget])
+        let viewModel = makeViewModel()
+        await viewModel.loadBudgets()
+        return viewModel
+    }
+
+    // MARK: - Carga
+
     @Test func loadBudgetsExposesTheLoadedBudgets() async {
         repository.budgetsResult = .success([TestData.budget])
         let viewModel = makeViewModel()
@@ -25,75 +35,156 @@ struct BudgetsViewModelTests {
         #expect(viewModel.state == .loaded([TestData.budget]))
     }
 
-    @Test func loadBudgetsFailureShowsTheMessage() async {
+    @Test func loadBudgetsFailureShowsTheUserMessage() async {
         repository.budgetsResult = .failure(.server("HTTP 500"))
         let viewModel = makeViewModel()
 
         await viewModel.loadBudgets()
 
-        #expect(viewModel.state == .error("Server error: HTTP 500"))
+        #expect(viewModel.state == .error(Failure.server("HTTP 500").userMessage))
     }
 
-    @Test func addBudgetReloadsTheList() async {
+    @Test func loadBudgetsFailureDoesNotExposeTheTechnicalDetail() async {
+        repository.budgetsResult = .failure(.server("HTTP 500"))
         let viewModel = makeViewModel()
 
-        await viewModel.addBudget(
+        await viewModel.loadBudgets()
+
+        guard case .error(let message) = viewModel.state else {
+            Issue.record("Expected an error state")
+            return
+        }
+        #expect(!message.contains("HTTP 500"))
+    }
+
+    @Test func aCancelledLoadDoesNotShowAnError() async {
+        repository.budgetsError = CancellationError()
+        let viewModel = makeViewModel()
+
+        await viewModel.loadBudgets()
+
+        #expect(viewModel.state == .initial)
+    }
+
+    @Test func aCancelledReloadKeepsTheLoadedBudgets() async {
+        let viewModel = await makeLoadedViewModel()
+        repository.budgetsError = CancellationError()
+
+        await viewModel.loadBudgets()
+
+        #expect(viewModel.state == .loaded([TestData.budget]))
+    }
+
+    // MARK: - Crear
+
+    @Test func addBudgetReloadsTheListAndReturnsNil() async {
+        let viewModel = makeViewModel()
+
+        let message = await viewModel.addBudget(
             name: "Ocio", category: "fun", limit: 100, color: "#FF0000",
             currency: "EUR", isRecurring: false, alertThreshold: 80
         )
 
+        #expect(message == nil)
         #expect(repository.createCalls == 1)
         #expect(repository.getBudgetsCalls == 1)
     }
 
-    @Test func addBudgetWithAnInvalidLimitShowsTheValidationMessageAndDoesNotCallTheRepository() async {
-        let viewModel = makeViewModel()
+    @Test func addBudgetWithAnInvalidLimitReturnsTheValidationMessageAndKeepsTheList() async {
+        let viewModel = await makeLoadedViewModel()
 
-        await viewModel.addBudget(
+        let message = await viewModel.addBudget(
             name: "Ocio", category: "fun", limit: 0, color: "#FF0000",
             currency: "EUR", isRecurring: false, alertThreshold: 80
         )
 
-        #expect(viewModel.state == .error("Limit must be greater than zero"))
+        #expect(message == String(localized: "validation_limit_positive"))
+        #expect(viewModel.state == .loaded([TestData.budget]))
         #expect(repository.createCalls == 0)
     }
 
-    @Test func editBudgetReloadsTheList() async {
+    @Test func failedAddBudgetReturnsTheUserMessageAndKeepsTheList() async {
+        let viewModel = await makeLoadedViewModel()
+        repository.createResult = .failure(.server("HTTP 500"))
+
+        let message = await viewModel.addBudget(
+            name: "Ocio", category: "fun", limit: 100, color: "#FF0000",
+            currency: "EUR", isRecurring: false, alertThreshold: 80
+        )
+
+        #expect(message == Failure.server("HTTP 500").userMessage)
+        #expect(viewModel.state == .loaded([TestData.budget]))
+    }
+
+    // MARK: - Editar
+
+    @Test func editBudgetReloadsTheListAndReturnsNil() async {
         let viewModel = makeViewModel()
 
-        await viewModel.editBudget(
+        let message = await viewModel.editBudget(
             id: "b1", name: "Comida", category: "food", limit: 350, color: "#7C3AED",
             currency: "EUR", isRecurring: true, alertThreshold: 90
         )
 
+        #expect(message == nil)
         #expect(repository.updatedId == "b1")
         #expect(repository.getBudgetsCalls == 1)
     }
 
+    @Test func failedEditBudgetReturnsTheUserMessageAndKeepsTheList() async {
+        let viewModel = await makeLoadedViewModel()
+        repository.updateResult = .failure(.network("offline"))
+
+        let message = await viewModel.editBudget(
+            id: "b1", name: "Comida", category: "food", limit: 350, color: "#7C3AED",
+            currency: "EUR", isRecurring: true, alertThreshold: 90
+        )
+
+        #expect(message == Failure.network("offline").userMessage)
+        #expect(viewModel.state == .loaded([TestData.budget]))
+    }
+
+    // MARK: - Borrar
+
     @Test func removeBudgetDeletesAndReloads() async {
         let viewModel = makeViewModel()
 
-        await viewModel.removeBudget(id: "b1")
+        let message = await viewModel.removeBudget(id: "b1")
 
+        #expect(message == nil)
         #expect(repository.deletedId == "b1")
         #expect(repository.getBudgetsCalls == 1)
     }
 
-    @Test func removeBudgetFailureShowsTheMessage() async {
+    @Test func failedRemoveBudgetReturnsTheUserMessageAndKeepsTheList() async {
+        let viewModel = await makeLoadedViewModel()
         repository.deleteResult = .failure(.server("HTTP 404"))
-        let viewModel = makeViewModel()
 
-        await viewModel.removeBudget(id: "b1")
+        let message = await viewModel.removeBudget(id: "b1")
 
-        #expect(viewModel.state == .error("Server error: HTTP 404"))
+        #expect(message == Failure.server("HTTP 404").userMessage)
+        #expect(viewModel.state == .loaded([TestData.budget]))
     }
+
+    // MARK: - Reiniciar recurrentes
 
     @Test func resetRecurringBudgetsReloadsTheList() async {
         let viewModel = makeViewModel()
 
-        await viewModel.resetRecurringBudgets()
+        let message = await viewModel.resetRecurringBudgets()
 
+        #expect(message == nil)
         #expect(repository.resetCalls == 1)
         #expect(repository.getBudgetsCalls == 1)
+    }
+
+    @Test func failedResetRecurringBudgetsReturnsTheUserMessage() async {
+        let viewModel = await makeLoadedViewModel()
+        repository.resetResult = .failure(.server("HTTP 500"))
+
+        let message = await viewModel.resetRecurringBudgets()
+
+        #expect(message == Failure.server("HTTP 500").userMessage)
+        #expect(viewModel.state == .loaded([TestData.budget]))
     }
 }

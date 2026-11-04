@@ -22,6 +22,8 @@ struct AddTransactionSheet: View {
     @State private var merchant = ""
     @State private var date = Date()
     @State private var tagsText = ""
+    @State private var isSaving = false
+    @State private var errorMessage: String?
 
     private let currencies = ["EUR", "USD", "GBP"]
     private var isEditing: Bool { transactionToEdit != nil }
@@ -63,33 +65,54 @@ struct AddTransactionSheet: View {
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     Button(String(localized: "save")) {
-                        Task {
-                            if isEditing, let t = transactionToEdit {
-                                await viewModel.editTransaction(
-                                    id: t.id, category: category, amount: amount,
-                                    currency: currency, description: description,
-                                    notes: notes, tags: tags,
-                                    receiptImageUrl: t.receiptImageUrl,
-                                    merchant: merchant.isEmpty ? nil : merchant,
-                                    date: date
-                                )
-                            } else {
-                                await viewModel.addTransaction(
-                                    category: category, amount: amount,
-                                    currency: currency, description: description,
-                                    notes: notes, tags: tags,
-                                    receiptImageUrl: nil,
-                                    merchant: merchant.isEmpty ? nil : merchant,
-                                    date: date, isScanned: false
-                                )
-                            }
-                            dismiss()
-                        }
+                        Task { await save() }
                     }
-                    .disabled(description.isEmpty || category.isEmpty || amount <= 0)
+                    .disabled(description.isEmpty || category.isEmpty || amount <= 0 || isSaving)
                 }
             }
+            .alert(String(localized: "error"), isPresented: Binding(
+                get: { errorMessage != nil },
+                set: { if !$0 { errorMessage = nil } }
+            )) {
+                Button(String(localized: "OK"), role: .cancel) {}
+            } message: {
+                Text(errorMessage ?? "")
+            }
             .onAppear { populateIfEditing() }
+        }
+    }
+
+    /// Guarda y cierra la hoja solo si salió bien. Si falla, la hoja sigue abierta con lo escrito
+    /// y se avisa con una alerta.
+    private func save() async {
+        isSaving = true
+        defer { isSaving = false }
+
+        let message: String?
+        if isEditing, let t = transactionToEdit {
+            message = await viewModel.editTransaction(
+                id: t.id, category: category, amount: amount,
+                currency: currency, description: description,
+                notes: notes, tags: tags,
+                receiptImageUrl: t.receiptImageUrl,
+                merchant: merchant.isEmpty ? nil : merchant,
+                date: date
+            )
+        } else {
+            message = await viewModel.addTransaction(
+                category: category, amount: amount,
+                currency: currency, description: description,
+                notes: notes, tags: tags,
+                receiptImageUrl: nil,
+                merchant: merchant.isEmpty ? nil : merchant,
+                date: date, isScanned: false
+            )
+        }
+
+        if let message {
+            errorMessage = message
+        } else {
+            dismiss()
         }
     }
 

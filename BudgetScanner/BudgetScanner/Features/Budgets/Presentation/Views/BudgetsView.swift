@@ -10,6 +10,7 @@ import SwiftUI
 
 struct BudgetsView: View {
     @State private var viewModel = BudgetsViewModel()
+    @State private var actionError: String?
 
     private let columns = [
         GridItem(.flexible()),
@@ -67,6 +68,14 @@ struct BudgetsView: View {
             .refreshable {
                 await viewModel.loadBudgets()
             }
+            .alert(String(localized: "error"), isPresented: Binding(
+                get: { actionError != nil },
+                set: { if !$0 { actionError = nil } }
+            )) {
+                Button(String(localized: "OK"), role: .cancel) {}
+            } message: {
+                Text(actionError ?? "")
+            }
         }
         .environment(viewModel)
     }
@@ -96,7 +105,7 @@ struct BudgetsView: View {
                             Label(String(localized: "edit"), systemImage: "pencil")
                         }
                         Button(role: .destructive) {
-                            Task { await viewModel.removeBudget(id: budget.id) }
+                            Task { actionError = await viewModel.removeBudget(id: budget.id) }
                         } label: {
                             Label(String(localized: "delete"), systemImage: "trash")
                         }

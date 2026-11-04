@@ -17,13 +17,23 @@ struct TransactionsViewModelTests {
         )
     }
 
-    private func addValidTransaction(to viewModel: TransactionsViewModel, amount: Double = 12.5, description: String = "Menú") async {
+    private func makeLoadedViewModel() async -> TransactionsViewModel {
+        repository.transactionsResult = .success([TestData.transaction])
+        let viewModel = makeViewModel()
+        await viewModel.loadTransactions()
+        return viewModel
+    }
+
+    @discardableResult
+    private func addValidTransaction(to viewModel: TransactionsViewModel, amount: Double = 12.5, description: String = "Menú") async -> String? {
         await viewModel.addTransaction(
             category: "food", amount: amount, currency: "EUR", description: description,
             notes: "", tags: [], receiptImageUrl: nil, merchant: nil,
             date: TestData.referenceDate, isScanned: false
         )
     }
+
+    // MARK: - Carga
 
     @Test func loadTransactionsFiltersByTheCurrentBudget() async {
         repository.transactionsResult = .success([TestData.transaction])
@@ -35,69 +45,117 @@ struct TransactionsViewModelTests {
         #expect(repository.lastBudgetIdFilter == "b1")
     }
 
-    @Test func loadTransactionsFailureShowsTheMessage() async {
+    @Test func loadTransactionsFailureShowsTheUserMessage() async {
         repository.transactionsResult = .failure(.network("offline"))
         let viewModel = makeViewModel()
 
         await viewModel.loadTransactions()
 
-        #expect(viewModel.state == .error("Network error: offline"))
+        #expect(viewModel.state == .error(Failure.network("offline").userMessage))
     }
 
-    @Test func addTransactionReloadsTheList() async {
+    @Test func loadTransactionsFailureDoesNotExposeTheTechnicalDetail() async {
+        repository.transactionsResult = .failure(.network("offline"))
         let viewModel = makeViewModel()
 
-        await addValidTransaction(to: viewModel)
+        await viewModel.loadTransactions()
 
+        guard case .error(let message) = viewModel.state else {
+            Issue.record("Expected an error state")
+            return
+        }
+        #expect(!message.contains("offline"))
+    }
+
+    // MARK: - Crear
+
+    @Test func addTransactionReloadsTheListAndReturnsNil() async {
+        let viewModel = makeViewModel()
+
+        let message = await addValidTransaction(to: viewModel)
+
+        #expect(message == nil)
         #expect(repository.createCalls == 1)
         #expect(repository.getTransactionsCalls == 1)
     }
 
-    @Test func addTransactionWithANonPositiveAmountShowsTheValidationMessage() async {
-        let viewModel = makeViewModel()
+    @Test func addTransactionWithANonPositiveAmountReturnsTheValidationMessageAndKeepsTheList() async {
+        let viewModel = await makeLoadedViewModel()
 
-        await addValidTransaction(to: viewModel, amount: 0)
+        let message = await addValidTransaction(to: viewModel, amount: 0)
 
-        #expect(viewModel.state == .error("Amount must be greater than zero"))
+        #expect(message == String(localized: "validation_amount_positive"))
+        #expect(viewModel.state == .loaded([TestData.transaction]))
         #expect(repository.createCalls == 0)
     }
 
-    @Test func addTransactionWithAnEmptyDescriptionShowsTheValidationMessage() async {
-        let viewModel = makeViewModel()
+    @Test func addTransactionWithAnEmptyDescriptionReturnsTheValidationMessage() async {
+        let viewModel = await makeLoadedViewModel()
 
-        await addValidTransaction(to: viewModel, description: "")
+        let message = await addValidTransaction(to: viewModel, description: "")
 
-        #expect(viewModel.state == .error("Description cannot be empty"))
+        #expect(message == String(localized: "validation_description_empty"))
+        #expect(viewModel.state == .loaded([TestData.transaction]))
         #expect(repository.createCalls == 0)
     }
 
-    @Test func editTransactionReloadsTheList() async {
+    @Test func failedAddTransactionReturnsTheUserMessageAndKeepsTheList() async {
+        let viewModel = await makeLoadedViewModel()
+        repository.createResult = .failure(.server("HTTP 500"))
+
+        let message = await addValidTransaction(to: viewModel)
+
+        #expect(message == Failure.server("HTTP 500").userMessage)
+        #expect(viewModel.state == .loaded([TestData.transaction]))
+    }
+
+    // MARK: - Editar
+
+    @Test func editTransactionReloadsTheListAndReturnsNil() async {
         let viewModel = makeViewModel()
 
-        await viewModel.editTransaction(
+        let message = await viewModel.editTransaction(
             id: "t1", category: "food", amount: 20, currency: "EUR", description: "Menú",
             notes: "", tags: [], receiptImageUrl: nil, merchant: nil, date: TestData.referenceDate
         )
 
+        #expect(message == nil)
         #expect(repository.updatedId == "t1")
         #expect(repository.getTransactionsCalls == 1)
     }
 
+    @Test func failedEditTransactionReturnsTheUserMessageAndKeepsTheList() async {
+        let viewModel = await makeLoadedViewModel()
+        repository.updateResult = .failure(.network("offline"))
+
+        let message = await viewModel.editTransaction(
+            id: "t1", category: "food", amount: 20, currency: "EUR", description: "Menú",
+            notes: "", tags: [], receiptImageUrl: nil, merchant: nil, date: TestData.referenceDate
+        )
+
+        #expect(message == Failure.network("offline").userMessage)
+        #expect(viewModel.state == .loaded([TestData.transaction]))
+    }
+
+    // MARK: - Borrar
+
     @Test func removeTransactionDeletesAndReloads() async {
         let viewModel = makeViewModel()
 
-        await viewModel.removeTransaction(id: "t1")
+        let message = await viewModel.removeTransaction(id: "t1")
 
+        #expect(message == nil)
         #expect(repository.deletedId == "t1")
         #expect(repository.getTransactionsCalls == 1)
     }
 
-    @Test func removeTransactionFailureShowsTheMessage() async {
+    @Test func failedRemoveTransactionReturnsTheUserMessageAndKeepsTheList() async {
+        let viewModel = await makeLoadedViewModel()
         repository.deleteResult = .failure(.server("HTTP 404"))
-        let viewModel = makeViewModel()
 
-        await viewModel.removeTransaction(id: "t1")
+        let message = await viewModel.removeTransaction(id: "t1")
 
-        #expect(viewModel.state == .error("Server error: HTTP 404"))
+        #expect(message == Failure.server("HTTP 404").userMessage)
+        #expect(viewModel.state == .loaded([TestData.transaction]))
     }
 }

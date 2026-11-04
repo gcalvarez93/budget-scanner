@@ -10,6 +10,7 @@ import SwiftUI
 
 struct ProfileView: View {
     @State private var viewModel = ProfileViewModel()
+    @State private var alertMessage: String?
     @Environment(ThemeManager.self) private var themeManager
     @Environment(AuthViewModel.self) private var authViewModel
 
@@ -31,6 +32,14 @@ struct ProfileView: View {
             }
             .navigationTitle(String(localized: "nav_profile"))
             .task { await viewModel.loadProfile() }
+            .alert(String(localized: "error"), isPresented: Binding(
+                get: { alertMessage != nil },
+                set: { if !$0 { alertMessage = nil } }
+            )) {
+                Button(String(localized: "OK"), role: .cancel) {}
+            } message: {
+                Text(alertMessage ?? "")
+            }
         }
         .environment(viewModel)
     }
@@ -92,11 +101,14 @@ struct ProfileView: View {
                         get: { profile.notifications },
                         set: { newValue in
                             Task {
-                                await viewModel.update(
+                                let saved = await viewModel.update(
                                     name: profile.name,
                                     language: profile.language,
                                     notifications: newValue
                                 )
+                                if !saved {
+                                    alertMessage = String(localized: "profile_update_error")
+                                }
                             }
                         }
                     ))
@@ -121,7 +133,7 @@ struct ProfileView: View {
 
             Section {
                 Button(role: .destructive) {
-                    Task { await authViewModel.signOut() }
+                    Task { alertMessage = await authViewModel.signOut() }
                 } label: {
                     Label(String(localized: "sign_out"), systemImage: "rectangle.portrait.and.arrow.right")
                 }
