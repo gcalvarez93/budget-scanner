@@ -108,8 +108,12 @@ Feature/
 Deliberate technical debt, documented rather than hidden:
 
 - **Expired session.** The network client treats every non-2xx response as a generic server error: a 401 is not told apart from a 500, and the app does not sign the user out or retry on its own. Firebase renews the ID token when the app asks for it, so the case is rare, but a server-side 401 ends in an error alert. Timeouts are the `URLSession` defaults rather than explicit values.
-- **No automated UI tests.** Alerts and sheets are checked by hand; the automated tests cover ViewModels, repositories, the network client and the user-facing messages.
+- **Receipt scanning is not implemented.** Despite the name, the app does not scan receipts yet. The data model already has room for it (`isScanned`, `receiptImageUrl`), but every transaction is currently entered by hand.
+- **Lists are reloaded through the global loading state.** After a successful create, edit or delete the list is reloaded and, while it loads, replaced by a spinner. If that reload fails, the full-screen error replaces the list even though the write succeeded. A failed write on its own does keep the list, as described above.
+- **No retry button on load errors.** The full-screen error state only shows the message.
+- **Test coverage.** The automated tests cover ViewModels, the budget and transaction repositories, the network client, the Firebase error mapper and the user-facing messages. The auth, analytics and profile repositories have no dedicated tests, and there are no automated UI tests (alerts and sheets are checked by hand).
 - **No DI container.** Dependencies are wired with default arguments in each ViewModel initialiser. That is simple at this size; if the project grew, a container would centralise the wiring.
+- **Shared code is copied, not shared.** `NetworkClient`, `Failure` and `FirebaseAuthErrorMapper` also exist in task-manager; there is no shared Swift package, so a fix has to be applied in both.
 
 ### Other projects in this portfolio
 
@@ -235,8 +239,12 @@ App de seguimiento de presupuestos y gastos desarrollada como parte del portfoli
 Deuda técnica asumida a propósito, documentada en lugar de ocultada:
 
 - **Sesión caducada.** El cliente de red trata cualquier respuesta no 2xx como un error genérico de servidor: un 401 no se distingue de un 500, y la app no cierra la sesión ni reintenta por sí sola. Firebase renueva el token de ID cuando la app lo pide, así que el caso es raro, pero un 401 del servidor acaba en una alerta de error. Los timeouts son los de `URLSession` por defecto, no valores explícitos.
-- **Sin tests de UI automáticos.** Las alertas y las hojas se comprueban a mano; los tests automáticos cubren ViewModels, repositorios, el cliente de red y los mensajes para el usuario.
+- **El escaneo de recibos no está implementado.** Pese al nombre, la app todavía no escanea recibos. El modelo de datos ya tiene sitio para ello (`isScanned`, `receiptImageUrl`), pero ahora todas las transacciones se introducen a mano.
+- **Las listas se recargan con el estado de carga global.** Tras crear, editar o borrar con éxito se recarga la lista y, mientras carga, se sustituye por un indicador de carga. Si esa recarga falla, el error a pantalla completa reemplaza la lista aunque la escritura haya salido bien. Una escritura fallida por sí sola sí conserva la lista, como se describe arriba.
+- **Sin botón de reintento en los errores de carga.** El estado de error a pantalla completa solo muestra el mensaje.
+- **Cobertura de tests.** Los tests automáticos cubren ViewModels, los repositorios de presupuestos y de transacciones, el cliente de red, el traductor de errores de Firebase y los mensajes para el usuario. Los repositorios de auth, analytics y perfil no tienen tests propios, y no hay tests de UI automáticos (las alertas y las hojas se comprueban a mano).
 - **Sin contenedor de DI.** Las dependencias se enlazan con argumentos por defecto en el inicializador de cada ViewModel. Es sencillo a este tamaño; si el proyecto creciera, un contenedor centralizaría el enlazado.
+- **Código compartido copiado, no compartido.** `NetworkClient`, `Failure` y `FirebaseAuthErrorMapper` existen también en task-manager; no hay un paquete Swift común, así que una corrección hay que aplicarla en los dos.
 
 ### Otros proyectos del portfolio
 
